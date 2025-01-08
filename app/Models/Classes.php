@@ -16,4 +16,9 @@ class Classes extends Model
     {
         return $this->hasMany(Section::class, 'class_id');
     }
+
+    public function students()
+    {
+        return $this->hasManyThrough(Student::class, Section::class, 'class_id', 'section_id');
+    }
 }

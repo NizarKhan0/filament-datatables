@@ -15,9 +15,12 @@ use App\Filament\Resources\ClassesResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ClassesResource\RelationManagers;
 
+
 class ClassesResource extends Resource
 {
     protected static ?string $model = Classes::class;
+
+    protected static ?string $navigationGroup = 'Academic Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -26,10 +29,10 @@ class ClassesResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name')
-                ->required()
-                ->autofocus()
-                ->unique()
-                ->placeholder('Enter a Class Name'),
+                    ->required()
+                    ->autofocus()
+                    ->unique(ignoreRecord: true)
+                    ->placeholder('Enter a Class Name'),
             ]);
     }
 
@@ -38,7 +41,14 @@ class ClassesResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->sortable(),
+                    ->sortable()
+                    ->searchable(),
+                TextColumn::make('sections_count')
+                    ->badge()
+                    ->counts('sections'),
+                TextColumn::make('students_count')
+                    ->counts('students')
+                    ->badge(),
             ])
             ->filters([
                 //

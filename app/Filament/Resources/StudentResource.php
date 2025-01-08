@@ -2,30 +2,31 @@
 
 namespace App\Filament\Resources;
 
-use App\Exports\StudentsExport;
-use Filament\Forms;
 use Filament\Tables;
 use App\Models\Classes;
 use App\Models\Section;
 use App\Models\Student;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
+use App\Exports\StudentsExport;
 use Filament\Resources\Resource;
+use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use App\Filament\Resources\StudentResource\Pages;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use App\Filament\Resources\StudentResource\RelationManagers;
 
 class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup ='Academic Management';
+    protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     public static function form(Form $form): Form
     {
@@ -63,7 +64,7 @@ class StudentResource extends Resource
                         if ($classId) {
                             return Section::where('class_id', $classId)->get()->pluck('name', 'id')->toArray();
                         }
-                    })
+                    }),
             ]);
     }
 
@@ -100,7 +101,53 @@ class StudentResource extends Resource
                     ->searchable(),
             ])
             ->filters([
-                //
+                Filter::make('class-section-filter')
+                    ->form([
+                        Select::make('class_id')
+                        ->label('Filter by Class')
+                        ->placeholder('Select Class')
+                        ->options(
+                            Classes::pluck('name', 'id')->toArray()
+                        )
+                        ->afterStateUpdated(
+                            function (callable $set){
+                                $set('section_id', null);
+                            }
+                        ),
+                        Select::make('section_id')
+                        ->label('Filter by Section')
+                        ->placeholder('Select a Section')
+                        ->options(
+                            function (callable $get){
+                                $classId = $get('class_id');
+
+                                if ($classId) {
+                                    return Section::where('class_id', $classId)->get()->pluck('name', 'id')->toArray();
+                                }
+                            }
+                        ),
+                        DatePicker::make('created_from'),
+                        DatePicker::make('created_until'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['class_id'],
+                                fn(Builder $query, $classId): Builder => $query->where('class_id', $classId),
+                            )
+                            ->when(
+                                $data['section_id'],
+                                fn(Builder $query, $sectionId): Builder => $query->where('section_id', $sectionId),
+                            )
+                            ->when(
+                                $data['created_from'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
@@ -110,8 +157,8 @@ class StudentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                     BulkAction::make('export')
-                    ->label('Export Selected')
-                    ->icon('heroicon-o-document-arrow-down')
+                        ->label('Export Selected')
+                        ->icon('heroicon-o-document-arrow-down')
                         ->action(fn(Collection $records) => (new StudentsExport($records))->download('students.xlsx')),
                 ]),
             ]);
@@ -131,5 +178,10 @@ class StudentResource extends Resource
             'create' => Pages\CreateStudent::route('/create'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return self::$model::count();
     }
 }

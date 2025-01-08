@@ -2,23 +2,29 @@
 
 namespace App\Filament\Resources;
 
+use Closure;
 use Filament\Forms;
 use Filament\Tables;
 use App\Models\Section;
+use Filament\Forms\Get;
 use Filament\Forms\Form;
 use Filament\Tables\Table;
 use Filament\Resources\Resource;
 use Filament\Forms\Components\Select;
+use Filament\Tables\Columns\TextColumn;
+use Illuminate\Validation\Rules\Unique;
 use Filament\Forms\Components\TextInput;
-use Illuminate\Database\Eloquent\Builder;
+
 use App\Filament\Resources\SectionResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SectionResource\RelationManagers;
-use Filament\Tables\Columns\TextColumn;
+
 
 class SectionResource extends Resource
 {
     protected static ?string $model = Section::class;
+
+    protected static ?string $navigationGroup = 'Academic Management';
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -29,8 +35,11 @@ class SectionResource extends Resource
                 TextInput::make('name')
                     ->required()
                     ->autofocus()
-                    ->unique()
-                    ->placeholder('Enter Section Name'),
+                    ->placeholder('Enter Section Name')
+                    ->unique(ignoreRecord: true, modifyRuleUsing: function (Get $get, Unique $rule) {
+                        return $rule->where('class_id', $get('class_id'));
+                    }),
+
                 Select::make('class_id')
                     ->relationship(name: 'class', titleAttribute: 'name')
             ]);
@@ -44,8 +53,12 @@ class SectionResource extends Resource
                     ->sortable()
                     ->searchable(),
                 TextColumn::make('class.name')
+                    ->badge()
                     ->sortable()
                     ->searchable(),
+                TextColumn::make('students_count')
+                    ->counts('students')
+                    ->badge(),
             ])
             ->filters([
                 //
