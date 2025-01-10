@@ -15,6 +15,7 @@ use Filament\Tables\Columns\TextColumn;
 use Illuminate\Validation\Rules\Unique;
 use Filament\Forms\Components\TextInput;
 
+use Filament\Tables\Columns\Summarizers\Average;
 use App\Filament\Resources\SectionResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SectionResource\RelationManagers;
@@ -58,6 +59,7 @@ class SectionResource extends Resource
                     ->searchable(),
                 TextColumn::make('students_count')
                     ->counts('students')
+                    ->summarize(Average::make())
                     ->badge(),
             ])
             ->filters([

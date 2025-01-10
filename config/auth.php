@@ -40,6 +40,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'student' => [
+            'driver' => 'session',
+            'provider' => 'students', // Ensure this matches the 'students' provider hati2 typo
+        ],
     ],
 
     /*
@@ -69,6 +73,12 @@ return [
         //     'driver' => 'database',
         //     'table' => 'users',
         // ],
+
+        'students' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Student::class), // Ensure this model exists
+        ],
+
     ],
 
     /*

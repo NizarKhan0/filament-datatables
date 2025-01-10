@@ -10,12 +10,14 @@ use Filament\Forms\Form;
 use Filament\Tables\Table;
 use App\Exports\StudentsExport;
 use Filament\Resources\Resource;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Filters\Filter;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Actions\BulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\DatePicker;
+use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -25,7 +27,7 @@ class StudentResource extends Resource
 {
     protected static ?string $model = Student::class;
 
-    protected static ?string $navigationGroup ='Academic Management';
+    protected static ?string $navigationGroup = 'Academic Management';
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
 
     public static function form(Form $form): Form
@@ -104,28 +106,28 @@ class StudentResource extends Resource
                 Filter::make('class-section-filter')
                     ->form([
                         Select::make('class_id')
-                        ->label('Filter by Class')
-                        ->placeholder('Select Class')
-                        ->options(
-                            Classes::pluck('name', 'id')->toArray()
-                        )
-                        ->afterStateUpdated(
-                            function (callable $set){
-                                $set('section_id', null);
-                            }
-                        ),
-                        Select::make('section_id')
-                        ->label('Filter by Section')
-                        ->placeholder('Select a Section')
-                        ->options(
-                            function (callable $get){
-                                $classId = $get('class_id');
-
-                                if ($classId) {
-                                    return Section::where('class_id', $classId)->get()->pluck('name', 'id')->toArray();
+                            ->label('Filter by Class')
+                            ->placeholder('Select Class')
+                            ->options(
+                                Classes::pluck('name', 'id')->toArray()
+                            )
+                            ->afterStateUpdated(
+                                function (callable $set) {
+                                    $set('section_id', null);
                                 }
-                            }
-                        ),
+                            ),
+                        Select::make('section_id')
+                            ->label('Filter by Section')
+                            ->placeholder('Select a Section')
+                            ->options(
+                                function (callable $get) {
+                                    $classId = $get('class_id');
+
+                                    if ($classId) {
+                                        return Section::where('class_id', $classId)->get()->pluck('name', 'id')->toArray();
+                                    }
+                                }
+                            ),
                         DatePicker::make('created_from'),
                         DatePicker::make('created_until'),
                     ])
@@ -151,7 +153,15 @@ class StudentResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                DeleteAction::make(),
+                Action::make('Downlaod Pdf')
+                    // ->icon('heroicon-o-document-download')
+                    // ->url(fn(Student $record): string => route('student.pdf.download', ['record' => $record]))
+                    ->openUrlInNewTab(),
+
+                Action::make('View Qr Code')
+                    // ->icon('heroicon-o-document-download')
+                    // ->url(fn(Student $record): string => static::getUrl('qr-code', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -163,6 +173,7 @@ class StudentResource extends Resource
                 ]),
             ]);
     }
+
 
     public static function getRelations(): array
     {
