@@ -9,10 +9,11 @@ use Filament\PanelProvider;
 
 //untuk buat cutom login aku declare dari sini -> kena pergi vendor yg Login punya by default extend SimplePage dari situ
 // sebab filament V3 dia tak publish semua
-use Filament\Support\Colors\Color;
+// ini aku import dari folder Auth yg aku buat kat app\Filament\Auth\StudentLogin tu custom sendii
+use App\Filament\Auth\StudentLogin;
 //
 
-use Filament\Pages\Auth\StudentLogin;
+use Filament\Support\Colors\Color;
 use Filament\Http\Middleware\Authenticate;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Cookie\Middleware\EncryptCookies;
