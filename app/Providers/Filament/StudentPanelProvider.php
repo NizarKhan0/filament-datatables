@@ -9,7 +9,7 @@ use Filament\PanelProvider;
 
 //untuk buat cutom login aku declare dari sini -> kena pergi vendor yg Login punya by default extend SimplePage dari situ
 // sebab filament V3 dia tak publish semua
-// ini aku import dari folder Auth yg aku buat kat app\Filament\Auth\StudentLogin tu custom sendii
+// ini aku import dari folder Auth yg aku buat kat app\Filament\Auth\StudentLogin tu custom sendiri
 use App\Filament\Auth\StudentLogin;
 //
 
