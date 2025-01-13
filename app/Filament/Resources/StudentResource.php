@@ -154,14 +154,6 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 DeleteAction::make(),
-                Action::make('Downlaod Pdf')
-                    // ->icon('heroicon-o-document-download')
-                    // ->url(fn(Student $record): string => route('student.pdf.download', ['record' => $record]))
-                    ->openUrlInNewTab(),
-
-                Action::make('View Qr Code')
-                    // ->icon('heroicon-o-document-download')
-                    // ->url(fn(Student $record): string => static::getUrl('qr-code', ['record' => $record])),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
