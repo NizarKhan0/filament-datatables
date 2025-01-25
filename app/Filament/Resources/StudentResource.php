@@ -154,10 +154,16 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 DeleteAction::make(),
+
                 Action::make('Download Pdf')
                     ->icon('heroicon-o-document')
-                    ->url(fn (Student $record): string => route('student.pdf.download', $record))
+                    ->url(fn(Student $record): string => route('student.pdf.download', $record))
                     ->openUrlInNewTab(),
+
+                Action::make('View Qr Code')
+                    ->icon('heroicon-o-qr-code')
+                    ->url(fn(Student $record): string => static::getUrl('qr-code', ['record' => $record->id])),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -184,6 +190,7 @@ class StudentResource extends Resource
             'index' => Pages\ListStudents::route('/'),
             'create' => Pages\CreateStudent::route('/create'),
             'edit' => Pages\EditStudent::route('/{record}/edit'),
+            'qr-code' => Pages\ViewQrCode::route('/{record}/qr-code'),
         ];
     }
 
