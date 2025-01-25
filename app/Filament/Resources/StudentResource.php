@@ -88,11 +88,11 @@ class StudentResource extends Resource
                     ->searchable()
                     ->toggleable(),
 
-                TextColumn::make('address')
-                    ->sortable()
-                    ->searchable()
-                    ->toggleable()
-                    ->wrap(),
+                // TextColumn::make('address')
+                //     ->sortable()
+                //     ->searchable()
+                //     ->toggleable()
+                //     ->wrap(),
 
                 TextColumn::make('class.name')
                     ->sortable()
@@ -154,6 +154,10 @@ class StudentResource extends Resource
             ->actions([
                 Tables\Actions\EditAction::make(),
                 DeleteAction::make(),
+                Action::make('Download Pdf')
+                    ->icon('heroicon-o-document')
+                    ->url(fn (Student $record): string => route('student.pdf.download', $record))
+                    ->openUrlInNewTab(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
