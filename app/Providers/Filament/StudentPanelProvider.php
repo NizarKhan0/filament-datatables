@@ -38,7 +38,7 @@ class StudentPanelProvider extends PanelProvider
             //login page custom
             ->login(StudentLogin::class)
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Rose,
             ])
             ->maxContentWidth(MaxWidth::Full)
             ->discoverResources(in: app_path('Filament/Student/Resources'), for: 'App\\Filament\\Student\\Resources')

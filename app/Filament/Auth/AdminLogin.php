@@ -46,7 +46,12 @@ class AdminLogin extends SimplePage
             redirect()->intended(Filament::getUrl());
         }
 
-        $this->form->fill();
+        if(app()->environment('local')){
+            $this->form->fill([
+                'email' => 'admin@demo.com',
+                'password' => 'password',
+            ]);
+        }
     }
 
     public function authenticate(): ?LoginResponse

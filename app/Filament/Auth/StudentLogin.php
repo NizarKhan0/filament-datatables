@@ -48,7 +48,12 @@ class StudentLogin extends SimplePage
             redirect()->intended(Filament::getUrl());
         }
 
-        $this->form->fill();
+        if(app()->environment('local')){
+            $this->form->fill([
+                'name' => 'Nizar',
+                'password' => 'password',
+            ]);
+        }
     }
 
     // public function authenticate(): ?LoginResponse
